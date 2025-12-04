@@ -1,7 +1,13 @@
 name = "ainova-life"
 compatibility_date = "2024-12-04"
 
+# R2 存储配置
+# 需要在 Cloudflare Dashboard 中创建 R2 bucket，名称: blog-storage
+[[r2_buckets]]
+binding = "BLOG_STORAGE"
+bucket_name = "blog-storage"
+preview_bucket_name = "blog-storage-preview"
+
 # 对于 Next.js，使用 Cloudflare Pages
 # 注意：Next.js 更适合部署到 Cloudflare Pages 而不是 Workers
-# 如果使用静态导出，需要配置 next.config.ts 中的 output: 'export'
 

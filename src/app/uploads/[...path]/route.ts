@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { getFileFromR2, R2Env } from '@/lib/r2-storage';
+
+function getEnv(): R2Env | undefined {
+  if (typeof process !== 'undefined' && (process.env as any).BLOG_STORAGE) {
+    return { BLOG_STORAGE: (process.env as any).BLOG_STORAGE };
+  }
+  if (typeof (globalThis as any).BLOG_STORAGE !== 'undefined') {
+    return { BLOG_STORAGE: (globalThis as any).BLOG_STORAGE };
+  }
+  return undefined;
+}
 
 export async function GET(
   request: NextRequest,
@@ -9,42 +17,19 @@ export async function GET(
 ) {
   try {
     const resolvedParams = await params;
-    const filePath = join(process.cwd(), 'public', 'uploads', ...resolvedParams.path);
+    const fileName = resolvedParams.path[resolvedParams.path.length - 1];
     
-    // 检查文件是否存在
-    if (!existsSync(filePath)) {
+    const env = getEnv();
+    const fileData = await getFileFromR2(fileName, env);
+    
+    if (!fileData) {
       return new NextResponse('File not found', { status: 404 });
     }
 
-    // 读取文件
-    const fileBuffer = await readFile(filePath);
-    
-    // 获取文件扩展名来设置正确的 Content-Type
-    const ext = resolvedParams.path[resolvedParams.path.length - 1].split('.').pop()?.toLowerCase();
-    let contentType = 'application/octet-stream';
-    
-    switch (ext) {
-      case 'jpg':
-      case 'jpeg':
-        contentType = 'image/jpeg';
-        break;
-      case 'png':
-        contentType = 'image/png';
-        break;
-      case 'gif':
-        contentType = 'image/gif';
-        break;
-      case 'webp':
-        contentType = 'image/webp';
-        break;
-      case 'svg':
-        contentType = 'image/svg+xml';
-        break;
-    }
-
-    return new NextResponse(fileBuffer, {
+    // 将 ReadableStream 转换为 Response
+    return new NextResponse(fileData.body, {
       headers: {
-        'Content-Type': contentType,
+        'Content-Type': fileData.contentType,
         'Cache-Control': 'public, max-age=31536000, immutable',
       },
     });

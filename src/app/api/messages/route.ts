@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { readFromR2, writeToR2, DATA_KEYS, R2Env } from '@/lib/r2-storage';
 
 interface Message {
   id: string;
@@ -10,25 +9,24 @@ interface Message {
   status: 'unread' | 'read';
 }
 
-const messagesFilePath = path.join(process.cwd(), 'data', 'messages.json');
-
-function readMessages(): Message[] {
-  try {
-    const data = fs.readFileSync(messagesFilePath, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('读取留言文件失败:', error);
-    return [];
+function getEnv(): R2Env | undefined {
+  if (typeof process !== 'undefined' && (process.env as any).BLOG_STORAGE) {
+    return { BLOG_STORAGE: (process.env as any).BLOG_STORAGE };
   }
+  if (typeof (globalThis as any).BLOG_STORAGE !== 'undefined') {
+    return { BLOG_STORAGE: (globalThis as any).BLOG_STORAGE };
+  }
+  return undefined;
 }
 
-function writeMessages(messages: Message[]): void {
-  try {
-    fs.writeFileSync(messagesFilePath, JSON.stringify(messages, null, 2));
-  } catch (error) {
-    console.error('写入留言文件失败:', error);
-    throw error;
-  }
+async function readMessages(): Promise<Message[]> {
+  const env = getEnv();
+  return await readFromR2<Message[]>(DATA_KEYS.MESSAGES, [], env);
+}
+
+async function writeMessages(messages: Message[]): Promise<void> {
+  const env = getEnv();
+  await writeToR2(DATA_KEYS.MESSAGES, messages, env);
 }
 
 export async function POST(request: NextRequest) {
@@ -58,9 +56,9 @@ export async function POST(request: NextRequest) {
       status: 'unread'
     };
 
-    const messages = readMessages();
+    const messages = await readMessages();
     messages.push(newMessage);
-    writeMessages(messages);
+    await writeMessages(messages);
 
     console.log('新留言:', newMessage);
 
@@ -79,7 +77,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const messages = readMessages();
+    const messages = await readMessages();
     return NextResponse.json({ messages });
   } catch (error) {
     console.error('获取留言失败:', error);
@@ -102,7 +100,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const messages = readMessages();
+    const messages = await readMessages();
     const messageIndex = messages.findIndex((msg: Message) => msg.id === id);
     if (messageIndex === -1) {
       return NextResponse.json(
@@ -112,7 +110,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     messages.splice(messageIndex, 1);
-    writeMessages(messages);
+    await writeMessages(messages);
 
     console.log('消息已删除:', id);
 

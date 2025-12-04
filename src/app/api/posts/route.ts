@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { readFromR2, writeToR2, DATA_KEYS, R2Env } from '@/lib/r2-storage';
 
 interface Post {
   id: string;
@@ -16,34 +15,34 @@ interface Post {
   readingTime: number;
 }
 
-const POSTS_FILE_PATH = path.join(process.cwd(), 'data', 'posts.json');
+// 获取 Cloudflare 环境变量
+function getEnv(): R2Env | undefined {
+  // 在 Cloudflare Pages 中，env 通过 process.env 或全局变量访问
+  // 这里使用类型断言，实际运行时 Cloudflare 会注入
+  if (typeof process !== 'undefined' && (process.env as any).BLOG_STORAGE) {
+    return {
+      BLOG_STORAGE: (process.env as any).BLOG_STORAGE,
+    };
+  }
+  // 尝试从全局变量获取（Cloudflare Pages 运行时）
+  if (typeof (globalThis as any).BLOG_STORAGE !== 'undefined') {
+    return {
+      BLOG_STORAGE: (globalThis as any).BLOG_STORAGE,
+    };
+  }
+  return undefined;
+}
 
 // 读取文章数据
-function readPosts(): Post[] {
-  try {
-    if (fs.existsSync(POSTS_FILE_PATH)) {
-      const data = fs.readFileSync(POSTS_FILE_PATH, 'utf8');
-      return JSON.parse(data);
-    }
-    return [];
-  } catch (error) {
-    console.error('读取文章数据失败:', error);
-    return [];
-  }
+async function readPosts(): Promise<Post[]> {
+  const env = getEnv();
+  return await readFromR2<Post[]>(DATA_KEYS.POSTS, [], env);
 }
 
 // 写入文章数据
-function writePosts(posts: Post[]): void {
-  try {
-    const dir = path.dirname(POSTS_FILE_PATH);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(POSTS_FILE_PATH, JSON.stringify(posts, null, 2));
-  } catch (error) {
-    console.error('写入文章数据失败:', error);
-    throw error;
-  }
+async function writePosts(posts: Post[]): Promise<void> {
+  const env = getEnv();
+  await writeToR2(DATA_KEYS.POSTS, posts, env);
 }
 
 export async function GET(request: NextRequest) {
@@ -53,7 +52,7 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get('status');
   const limit = searchParams.get('limit');
 
-  let filteredPosts = readPosts();
+  let filteredPosts = await readPosts();
 
   // 按slug查找单个文章
   if (slug) {
@@ -107,9 +106,9 @@ export async function POST(request: NextRequest) {
       readingTime: Math.ceil((data.content || '').length / 500)
     };
 
-    const posts = readPosts();
+    const posts = await readPosts();
     posts.push(newPost);
-    writePosts(posts);
+    await writePosts(posts);
 
     console.log('新文章已创建:', newPost);
 
@@ -131,7 +130,7 @@ export async function PUT(request: NextRequest) {
     const data = await request.json();
     const { id, ...updateData } = data;
 
-    const posts = readPosts();
+    const posts = await readPosts();
     const postIndex = posts.findIndex(p => p.id === id);
     if (postIndex === -1) {
       return NextResponse.json({ error: '文章不存在' }, { status: 404 });
@@ -145,7 +144,7 @@ export async function PUT(request: NextRequest) {
         : posts[postIndex].publishedAt
     };
 
-    writePosts(posts);
+    await writePosts(posts);
     console.log('文章已更新:', posts[postIndex]);
 
     return NextResponse.json(
@@ -170,14 +169,14 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: '缺少文章ID' }, { status: 400 });
     }
 
-    const posts = readPosts();
+    const posts = await readPosts();
     const postIndex = posts.findIndex(p => p.id === id);
     if (postIndex === -1) {
       return NextResponse.json({ error: '文章不存在' }, { status: 404 });
     }
 
     const deletedPost = posts.splice(postIndex, 1)[0];
-    writePosts(posts);
+    await writePosts(posts);
 
     console.log('文章已删除:', deletedPost);
 

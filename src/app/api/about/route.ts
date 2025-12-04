@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readJsonFile, writeJsonFile, DATA_FILES } from '@/lib/storage';
+import { readFromR2, writeToR2, DATA_KEYS, R2Env } from '@/lib/r2-storage';
 
 interface TimelineItem {
   id: string;
@@ -134,9 +134,20 @@ const defaultAboutData: AboutData = {
   ]
 };
 
+function getEnv(): R2Env | undefined {
+  if (typeof process !== 'undefined' && (process.env as any).BLOG_STORAGE) {
+    return { BLOG_STORAGE: (process.env as any).BLOG_STORAGE };
+  }
+  if (typeof (globalThis as any).BLOG_STORAGE !== 'undefined') {
+    return { BLOG_STORAGE: (globalThis as any).BLOG_STORAGE };
+  }
+  return undefined;
+}
+
 export async function GET() {
   try {
-    const aboutData = await readJsonFile(DATA_FILES.ABOUT, defaultAboutData);
+    const env = getEnv();
+    const aboutData = await readFromR2(DATA_KEYS.ABOUT, defaultAboutData, env);
     return NextResponse.json(aboutData);
   } catch (error) {
     console.error('读取关于页面数据失败:', error);
@@ -147,10 +158,11 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     const data = await request.json();
-    const currentData = await readJsonFile(DATA_FILES.ABOUT, defaultAboutData);
+    const env = getEnv();
+    const currentData = await readFromR2(DATA_KEYS.ABOUT, defaultAboutData, env);
     const updatedData = { ...currentData, ...data };
     
-    await writeJsonFile(DATA_FILES.ABOUT, updatedData);
+    await writeToR2(DATA_KEYS.ABOUT, updatedData, env);
     
     console.log('关于页面数据已更新:', updatedData);
     
@@ -174,7 +186,8 @@ export async function POST(request: NextRequest) {
     const action = searchParams.get('action');
     const data = await request.json();
     
-    const aboutData = await readJsonFile(DATA_FILES.ABOUT, defaultAboutData);
+    const env = getEnv();
+    const aboutData = await readFromR2(DATA_KEYS.ABOUT, defaultAboutData, env);
 
     switch (action) {
       case 'add-timeline':
@@ -217,7 +230,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: '无效的操作' }, { status: 400 });
     }
 
-    await writeJsonFile(DATA_FILES.ABOUT, aboutData);
+    await writeToR2(DATA_KEYS.ABOUT, aboutData, env);
 
     return NextResponse.json(
       { message: '操作成功', data: aboutData },
@@ -242,7 +255,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: '缺少参数' }, { status: 400 });
     }
 
-    const aboutData = await readJsonFile(DATA_FILES.ABOUT, defaultAboutData);
+    const env = getEnv();
+    const aboutData = await readFromR2(DATA_KEYS.ABOUT, defaultAboutData, env);
 
     switch (type) {
       case 'timeline':
@@ -257,7 +271,7 @@ export async function DELETE(request: NextRequest) {
         return NextResponse.json({ error: '无效的类型' }, { status: 400 });
     }
 
-    await writeJsonFile(DATA_FILES.ABOUT, aboutData);
+    await writeToR2(DATA_KEYS.ABOUT, aboutData, env);
 
     return NextResponse.json(
       { message: '删除成功', data: aboutData },

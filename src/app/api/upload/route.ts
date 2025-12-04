@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { uploadFileToR2, R2Env } from '@/lib/r2-storage';
+
+// 获取 Cloudflare 环境变量
+function getEnv(): R2Env | undefined {
+  if (typeof process !== 'undefined' && (process.env as any).BLOG_STORAGE) {
+    return {
+      BLOG_STORAGE: (process.env as any).BLOG_STORAGE,
+    };
+  }
+  if (typeof (globalThis as any).BLOG_STORAGE !== 'undefined') {
+    return {
+      BLOG_STORAGE: (globalThis as any).BLOG_STORAGE,
+    };
+  }
+  return undefined;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,25 +46,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 创建上传目录
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
     // 生成唯一文件名
     const timestamp = Date.now();
     const fileExtension = file.name.split('.').pop();
     const fileName = `${timestamp}-${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
-    const filePath = join(uploadDir, fileName);
 
-    // 保存文件
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    await writeFile(filePath, buffer);
-
-    // 生成相对路径URL（自动适配任何域名和端口）
-    const fileUrl = `/uploads/${fileName}`;
+    // 上传到 R2（或回退到文件系统）
+    const env = getEnv();
+    const fileUrl = await uploadFileToR2(fileName, file, env);
     
     console.log('文件上传成功:', fileUrl);
     
