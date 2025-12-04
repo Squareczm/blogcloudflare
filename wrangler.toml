@@ -2,7 +2,7 @@ name = "ainova-life"
 compatibility_date = "2024-12-04"
 
 # ============================================
-# 重要：这是 Cloudflare Pages 项目
+# ⚠️ 重要：这是 Cloudflare Pages 项目
 # ============================================
 # 
 # 此项目使用 Cloudflare Pages 部署（不是 Workers）
@@ -11,11 +11,18 @@ compatibility_date = "2024-12-04"
 # 1. 在 Cloudflare Dashboard 中连接 GitHub 仓库
 #    构建命令: npm run build
 #    输出目录: .next
-#    部署命令: （留空，让 Cloudflare Pages 自动处理）
+#    部署命令: （⚠️ 必须留空，让 Cloudflare Pages 自动处理）
+#            （不要设置 npx wrangler deploy，那是 Workers 的命令）
 #
 # 2. 或者使用 CLI：
 #    npm run build
 #    npx wrangler pages deploy .next --project-name=ainova-life
+#
+# ============================================
+# 
+# ⚠️ 注意：此文件仅用于 Pages 项目配置
+# 不要在 Cloudflare Dashboard 中设置自定义部署命令
+# Cloudflare Pages 会自动检测并处理 Next.js 项目
 #
 # ============================================
 
