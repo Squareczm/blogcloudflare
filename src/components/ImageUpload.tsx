@@ -32,9 +32,9 @@ export default function ImageUpload({ onImageUploaded, currentImage, className =
         body: formData,
       });
 
-      const result = await response.json();
+      const result = await response.json() as { url?: string; error?: string };
       
-      if (response.ok) {
+      if (response.ok && result.url) {
         onImageUploaded(result.url);
         setPreview(result.url);
       } else {

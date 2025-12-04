@@ -65,7 +65,7 @@ export default function AboutPage() {
             'Cache-Control': 'no-cache',
           },
         });
-        const data = await response.json();
+        const data = await response.json() as AboutData;
         setAboutData(data);
       } catch (error) {
         console.error('获取关于页面数据失败:', error);

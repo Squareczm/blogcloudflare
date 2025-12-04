@@ -48,7 +48,7 @@ export default function NewPostPage() {
         body: JSON.stringify(postData),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string };
 
       if (response.ok) {
         if (publish) {

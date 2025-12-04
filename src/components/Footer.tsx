@@ -30,7 +30,7 @@ export default function Footer() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
+        const data = await response.json() as { aboutText?: string; wechatQRCode?: string; coffeeQRCode?: string };
         console.log('Footer: 设置获取成功', data);
         setSettings({
           aboutText: data.aboutText || settings.aboutText,

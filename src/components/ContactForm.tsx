@@ -38,7 +38,7 @@ export default function ContactForm({ className = '', source = 'footer' }: Conta
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string; success?: boolean };
 
       if (response.ok) {
         setSubmitStatus('success');

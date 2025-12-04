@@ -53,11 +53,11 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const data = await request.json();
+    const data = await request.json() as { action?: string; [key: string]: unknown };
     const { action, ...updateData } = data;
 
     if (action === 'change-password') {
-      const { currentPassword, newPassword } = updateData;
+      const { currentPassword, newPassword } = updateData as { currentPassword?: string; newPassword?: string };
       
       if (adminAccount.password !== currentPassword) {
         return NextResponse.json(
@@ -85,7 +85,7 @@ export async function PUT(request: NextRequest) {
     }
 
     if (action === 'update-profile') {
-      const { username, email, name } = updateData;
+      const { username, email, name } = updateData as { username?: string; email?: string; name?: string };
       
       if (username) adminAccount.username = username;
       if (email) adminAccount.email = email;
@@ -116,7 +116,7 @@ export async function PUT(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json();
+    const data = await request.json() as { action?: string; username?: string; password?: string };
     const { action, username, password } = data;
 
     if (action === 'login') {

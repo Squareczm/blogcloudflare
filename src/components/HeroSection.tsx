@@ -36,12 +36,12 @@ export default function HeroSection() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
+        const data = await response.json() as SiteSettings;
         console.log('HeroSection: 设置获取成功', data);
         setSettings({
           title: data.title,
           subtitle: data.subtitle,
-          titleAlign: data.titleAlign || 'center',
+          titleAlign: (data.titleAlign as 'left' | 'center' | 'right') || 'center',
           subtitleAlign: data.subtitleAlign || 'center',
           bannerImage: data.bannerImage
         });

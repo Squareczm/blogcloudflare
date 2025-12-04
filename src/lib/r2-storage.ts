@@ -3,6 +3,8 @@
  * 用于替代文件系统存储，支持 Cloudflare R2
  */
 
+/// <reference types="@cloudflare/workers-types" />
+
 // R2 环境类型定义
 export interface R2Env {
   BLOG_STORAGE: R2Bucket;

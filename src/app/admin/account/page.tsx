@@ -48,7 +48,7 @@ export default function AccountManagement() {
   const fetchAccountInfo = async () => {
     try {
       const response = await fetch('/api/admin');
-      const data = await response.json();
+      const data = await response.json() as AdminAccount;
       setAccount(data);
       setProfileForm({
         username: data.username,
@@ -74,10 +74,12 @@ export default function AccountManagement() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { data?: AdminAccount; error?: string };
 
       if (response.ok) {
-        setAccount(data.data);
+        if (data.data) {
+          setAccount(data.data);
+        }
         alert('个人信息更新成功！');
       } else {
         alert(data.error || '更新失败');
@@ -113,7 +115,7 @@ export default function AccountManagement() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string; message?: string };
 
       if (response.ok) {
         setPasswordForm({

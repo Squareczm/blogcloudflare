@@ -35,7 +35,7 @@ export default function SettingsPage() {
     const fetchSettings = async () => {
       try {
         const response = await fetch('/api/settings');
-        const data = await response.json();
+        const data = await response.json() as SiteSettings;
         setSettings(data);
       } catch (error) {
         console.error('获取设置失败:', error);
@@ -62,8 +62,10 @@ export default function SettingsPage() {
       });
 
       if (response.ok) {
-        const result = await response.json();
-        handleInputChange(field, result.url);
+        const result = await response.json() as { url?: string };
+        if (result.url) {
+          handleInputChange(field, result.url);
+        }
       } else {
         alert('图片上传失败，请重试');
       }
@@ -85,7 +87,7 @@ export default function SettingsPage() {
         body: JSON.stringify(settings),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { success?: boolean; error?: string };
 
       if (response.ok) {
         alert('设置已保存');

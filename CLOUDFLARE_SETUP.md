@@ -17,8 +17,8 @@
 2. 进入 **R2** 部分
 3. 点击 **Create bucket**
 4. 创建两个 bucket：
-   - **主 bucket**: `blog-storage` (生产环境)
-   - **预览 bucket**: `blog-storage-preview` (预览环境，可选)
+   - **主 bucket**: `blog-uploads` (生产环境)
+   - **预览 bucket**: `blog-uploads-preview` (预览环境，可选)
 
 ### 2. 配置 R2 公共访问（用于文件访问）
 
@@ -36,7 +36,7 @@
 2. 进入 **Settings** > **Functions**
 3. 在 **R2 Bucket Bindings** 中添加：
    - **Variable name**: `BLOG_STORAGE`
-   - **R2 bucket**: `blog-storage`
+   - **R2 bucket**: `blog-uploads`
 
 ### 4. 部署命令
 
@@ -70,7 +70,7 @@ npx wrangler pages deploy .next --project-name=ainova-life
 ```toml
 [[r2_buckets]]
 binding = "BLOG_STORAGE"
-bucket_name = "blog-storage"
+bucket_name = "blog-uploads"
 ```
 
 ### 代码中的使用
@@ -106,7 +106,7 @@ bucket_name = "blog-storage"
 ### 问题：部署时找不到 R2 bucket
 
 **解决**：
-1. 确保在 Cloudflare Dashboard 中创建了 `blog-storage` bucket
+1. 确保在 Cloudflare Dashboard 中创建了 `blog-uploads` bucket
 2. 确保在 Pages 设置中绑定了 R2 bucket
 3. 检查 `wrangler.toml` 中的 bucket 名称是否正确
 

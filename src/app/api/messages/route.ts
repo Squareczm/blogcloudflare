@@ -31,7 +31,8 @@ async function writeMessages(messages: Message[]): Promise<void> {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, content } = await request.json();
+    const data = await request.json() as { email?: string; content?: string };
+    const { email, content } = data;
 
     if (!email || !email.includes('@')) {
       return NextResponse.json(

@@ -46,8 +46,10 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
       try {
         const response = await fetch(`/api/posts?id=${id}`);
         if (response.ok) {
-          const data = await response.json();
-          setPost(data.post);
+          const data = await response.json() as { post?: Post };
+          if (data.post) {
+            setPost(data.post);
+          }
         } else {
           alert('文章不存在');
           router.push('/admin/posts');

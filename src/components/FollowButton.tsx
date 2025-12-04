@@ -29,7 +29,7 @@ export default function FollowButton({ className = '', variant = 'default' }: Fo
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
+        const data = await response.json() as { wechatQRCode?: string };
         console.log('FollowButton: 设置获取成功', data);
         setWechatQRCode(data.wechatQRCode || '');
       } catch (error) {

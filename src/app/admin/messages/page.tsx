@@ -26,7 +26,7 @@ export default function MessagesPage() {
             'Cache-Control': 'no-cache',
           },
         });
-        const data = await response.json();
+        const data = await response.json() as { messages?: Message[] };
         setMessages(data.messages || []);
       } catch (error) {
         console.error('获取消息失败:', error);

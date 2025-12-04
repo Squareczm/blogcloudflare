@@ -30,7 +30,8 @@ async function writeSubscribers(subscribers: Subscriber[]): Promise<void> {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
+    const data = await request.json() as { email?: string };
+    const { email } = data;
 
     if (!email || !email.includes('@')) {
       return NextResponse.json(

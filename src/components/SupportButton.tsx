@@ -29,7 +29,7 @@ export default function SupportButton({ className = '', variant = 'default' }: S
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
+        const data = await response.json() as { coffeeQRCode?: string };
         console.log('SupportButton: 设置获取成功', data);
         setCoffeeQRCode(data.coffeeQRCode || '');
       } catch (error) {

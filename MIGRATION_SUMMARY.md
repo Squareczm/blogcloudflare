@@ -62,7 +62,7 @@
 1. 登录 Cloudflare Dashboard
 2. 进入 **R2** 部分
 3. 点击 **Create bucket**
-4. 创建 bucket：`blog-storage`
+4. 创建 bucket：`blog-uploads`
 
 ### 2. 配置 Cloudflare Pages Functions
 
@@ -70,7 +70,7 @@
 2. 进入 **Settings** > **Functions**
 3. 在 **R2 Bucket Bindings** 中添加：
    - **Variable name**: `BLOG_STORAGE`
-   - **R2 bucket**: `blog-storage`
+   - **R2 bucket**: `blog-uploads`
 
 ### 3. 更新部署命令
 

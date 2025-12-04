@@ -28,7 +28,7 @@ export default function SubscribeForm({ className = '', source = 'footer' }: Sub
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string; success?: boolean };
 
       if (response.ok) {
         setSubmitStatus('success');

@@ -26,7 +26,7 @@ export default function AdminPosts() {
             'Cache-Control': 'no-cache',
           },
         });
-        const data = await response.json();
+        const data = await response.json() as { posts?: Post[] };
         setPosts(data.posts || []);
       } catch (error) {
         console.error('获取文章失败:', error);

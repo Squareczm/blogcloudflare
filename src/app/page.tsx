@@ -37,7 +37,7 @@ export default function Home() {
         });
         
         if (response.ok) {
-          const data = await response.json();
+          const data = await response.json() as { posts?: Post[] };
           setLatestPosts(data.posts || []);
         }
       } catch (error) {

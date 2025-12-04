@@ -37,6 +37,11 @@ interface AboutData {
   projects: Project[];
 }
 
+interface ApiResponse {
+  data: AboutData;
+  message?: string;
+}
+
 export default function AboutManagement() {
   const [aboutData, setAboutData] = useState<AboutData>({
     introduction: '',
@@ -113,7 +118,7 @@ export default function AboutManagement() {
           'Cache-Control': 'no-cache',
         },
       });
-      const data = await response.json();
+      const data = await response.json() as AboutData;
       setAboutData(data);
     } catch (error) {
       console.error('获取关于页面数据失败:', error);
@@ -176,7 +181,7 @@ export default function AboutManagement() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as ApiResponse;
         setAboutData(data.data);
         setShowTimelineModal(false);
         setTimelineForm({ year: '', title: '', description: '', type: 'work' });
@@ -207,7 +212,7 @@ export default function AboutManagement() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as ApiResponse;
         setAboutData(data.data);
       }
     } catch (error) {
@@ -234,7 +239,7 @@ export default function AboutManagement() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as ApiResponse;
         setAboutData(data.data);
         setShowProjectModal(false);
         setProjectForm({
@@ -272,7 +277,7 @@ export default function AboutManagement() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as ApiResponse;
         setAboutData(data.data);
       }
     } catch (error) {

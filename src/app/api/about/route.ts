@@ -157,9 +157,9 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    const data = await request.json();
+    const data = await request.json() as Partial<AboutData>;
     const env = getEnv();
-    const currentData = await readFromR2(DATA_KEYS.ABOUT, defaultAboutData, env);
+    const currentData = await readFromR2<AboutData>(DATA_KEYS.ABOUT, defaultAboutData, env);
     const updatedData = { ...currentData, ...data };
     
     await writeToR2(DATA_KEYS.ABOUT, updatedData, env);
@@ -184,47 +184,55 @@ export async function POST(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action');
-    const data = await request.json();
+    const data = await request.json() as Partial<TimelineItem | Project> & { id?: string };
     
     const env = getEnv();
-    const aboutData = await readFromR2(DATA_KEYS.ABOUT, defaultAboutData, env);
+    const aboutData = await readFromR2<AboutData>(DATA_KEYS.ABOUT, defaultAboutData, env);
 
     switch (action) {
-      case 'add-timeline':
+      case 'add-timeline': {
+        const timelineData = data as Partial<TimelineItem>;
         const newTimelineItem: TimelineItem = {
           id: Date.now().toString(),
-          ...data
-        };
+          ...timelineData
+        } as TimelineItem;
         aboutData.timeline.push(newTimelineItem);
         aboutData.timeline.sort((a, b) => parseInt(b.year) - parseInt(a.year));
         break;
+      }
 
-      case 'update-timeline':
-        const timelineIndex = aboutData.timeline.findIndex(item => item.id === data.id);
+      case 'update-timeline': {
+        const timelineData = data as Partial<TimelineItem> & { id: string };
+        const timelineIndex = aboutData.timeline.findIndex(item => item.id === timelineData.id);
         if (timelineIndex !== -1) {
-          aboutData.timeline[timelineIndex] = { ...aboutData.timeline[timelineIndex], ...data };
+          aboutData.timeline[timelineIndex] = { ...aboutData.timeline[timelineIndex], ...timelineData };
           aboutData.timeline.sort((a, b) => parseInt(b.year) - parseInt(a.year));
         } else {
           return NextResponse.json({ error: '时间线项目不存在' }, { status: 404 });
         }
         break;
+      }
 
-      case 'add-project':
+      case 'add-project': {
+        const projectData = data as Partial<Project>;
         const newProject: Project = {
           id: Date.now().toString(),
-          ...data
-        };
+          ...projectData
+        } as Project;
         aboutData.projects.push(newProject);
         break;
+      }
 
-      case 'update-project':
-        const projectIndex = aboutData.projects.findIndex(project => project.id === data.id);
+      case 'update-project': {
+        const projectData = data as Partial<Project> & { id: string };
+        const projectIndex = aboutData.projects.findIndex(project => project.id === projectData.id);
         if (projectIndex !== -1) {
-          aboutData.projects[projectIndex] = { ...aboutData.projects[projectIndex], ...data };
+          aboutData.projects[projectIndex] = { ...aboutData.projects[projectIndex], ...projectData };
         } else {
           return NextResponse.json({ error: '项目不存在' }, { status: 404 });
         }
         break;
+      }
 
       default:
         return NextResponse.json({ error: '无效的操作' }, { status: 400 });

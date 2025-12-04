@@ -33,7 +33,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { contact, type = 'phone' } = await request.json();
+    const data = await request.json() as { contact?: string; type?: 'email' | 'wechat' | 'phone' };
+    const { contact, type = 'phone' } = data;
 
     if (!contact || contact.trim().length === 0) {
       return NextResponse.json(

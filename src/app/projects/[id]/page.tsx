@@ -35,8 +35,8 @@ export default function ProjectDetail() {
             'Cache-Control': 'no-cache',
           },
         });
-        const data = await response.json();
-        const foundProject = data.projects.find((p: Project) => p.id === params.id);
+        const data = await response.json() as { projects?: Project[] };
+        const foundProject = data.projects?.find((p: Project) => p.id === params.id);
         
         if (foundProject) {
           setProject(foundProject);

@@ -90,15 +90,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json();
+    const data = await request.json() as Partial<Post> & { coverImage?: string; tags?: string[] };
     
     const newPost: Post = {
       id: Date.now().toString(),
       title: data.title || '无标题',
       content: data.content || '',
       excerpt: data.excerpt || '',
-      category: data.category || 'ai',
-      status: data.status || 'draft',
+      category: (data.category as Post['category']) || 'ai',
+      status: (data.status as Post['status']) || 'draft',
       publishedAt: data.status === 'published' ? new Date().toISOString() : null,
       slug: generateSlug(data.title || '无标题'),
       featuredImage: data.coverImage || 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const data = await request.json();
+    const data = await request.json() as Partial<Post> & { id: string; coverImage?: string; tags?: string[] };
     const { id, ...updateData } = data;
 
     const posts = await readPosts();

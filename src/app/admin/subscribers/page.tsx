@@ -28,7 +28,7 @@ export default function ContactsPage() {
             'Cache-Control': 'no-cache',
           },
         });
-        const data = await response.json();
+        const data = await response.json() as { contacts?: Contact[] };
         setContacts(data.contacts || []);
       } catch (error) {
         console.error('获取联系方式失败:', error);
@@ -54,7 +54,7 @@ export default function ContactsPage() {
           'Cache-Control': 'no-cache',
         },
       });
-      const data = await response.json();
+      const data = await response.json() as { contacts?: Contact[] };
       setContacts(data.contacts || []);
     } catch (error) {
       console.error('刷新联系方式失败:', error);

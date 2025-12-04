@@ -19,8 +19,8 @@ compatibility_date = "2024-12-04"
 # 如果使用其他存储方案，可以删除或注释这部分
 # [[r2_buckets]]
 # binding = "BLOG_STORAGE"
-# bucket_name = "blog-storage"
-# preview_bucket_name = "blog-storage-preview"
+# bucket_name = "blog-uploads"
+# preview_bucket_name = "blog-uploads-preview"
 
 # 如果使用 Workers，需要指定入口点（需要适配器）
 # main = "src/index.ts"

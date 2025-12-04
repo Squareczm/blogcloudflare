@@ -30,19 +30,19 @@ export default function AdminDashboard() {
       try {
         // 获取文章统计
         const postsRes = await fetch('/api/posts');
-        const postsData = await postsRes.json();
+        const postsData = await postsRes.json() as { posts?: Post[] };
         const posts = postsData.posts || [];
         setPostCount(posts.length);
         setRecentPosts(posts.slice(0, 3));
 
         // 获取订阅用户统计
         const subRes = await fetch('/api/subscribe');
-        const subData = await subRes.json();
+        const subData = await subRes.json() as { subscribers?: unknown[] };
         setSubscriberCount((subData.subscribers || []).length);
 
         // 获取留言统计
         const msgRes = await fetch('/api/messages');
-        const msgData = await msgRes.json();
+        const msgData = await msgRes.json() as { messages?: Message[] };
         const messages = msgData.messages || [];
         setMessageCount(messages.length);
         setUnreadMessageCount(messages.filter((msg: Message) => msg.status === 'unread').length);

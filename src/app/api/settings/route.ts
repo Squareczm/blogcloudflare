@@ -60,7 +60,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const newSettings = await request.json();
+    const newSettings = await request.json() as Partial<SiteSettings>;
     const currentSettings = await readSettings();
     
     // 更新设置

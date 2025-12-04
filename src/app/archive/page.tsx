@@ -38,7 +38,7 @@ export default function ArchivePage() {
         });
         
         if (response.ok) {
-          const data = await response.json();
+          const data = await response.json() as { posts?: Post[] };
           // 按发布时间倒序排列
           const sortedPosts = (data.posts || []).sort((a: Post, b: Post) => 
             new Date(b.publishedAt || '').getTime() - new Date(a.publishedAt || '').getTime()
