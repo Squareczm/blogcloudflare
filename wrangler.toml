@@ -1,13 +1,31 @@
 name = "ainova-life"
 compatibility_date = "2024-12-04"
 
-# R2 存储配置
-# 需要在 Cloudflare Dashboard 中创建 R2 bucket，名称: blog-storage
-[[r2_buckets]]
-binding = "BLOG_STORAGE"
-bucket_name = "blog-storage"
-preview_bucket_name = "blog-storage-preview"
+# ============================================
+# 重要：选择部署方式
+# ============================================
+# 
+# 方式 1: Cloudflare Pages（推荐，适合 Next.js）
+#   部署命令: npx wrangler pages deploy .next
+#   不需要适配器，直接支持 Next.js
+#
+# 方式 2: Cloudflare Workers（需要适配器）
+#   需要安装 @cloudflare/next-on-pages 或使用 OpenNext
+#   部署命令: npx wrangler deploy
+#
+# ============================================
 
-# 对于 Next.js，使用 Cloudflare Pages
-# 注意：Next.js 更适合部署到 Cloudflare Pages 而不是 Workers
+# R2 存储配置（如果使用 R2）
+# 如果使用其他存储方案，可以删除或注释这部分
+# [[r2_buckets]]
+# binding = "BLOG_STORAGE"
+# bucket_name = "blog-storage"
+# preview_bucket_name = "blog-storage-preview"
+
+# 如果使用 Workers，需要指定入口点（需要适配器）
+# main = "src/index.ts"
+
+# 如果使用静态资源部署
+# [assets]
+# directory = "./dist"
 

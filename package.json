@@ -13,7 +13,8 @@
     "test:security": "node scripts/security-test.js",
     "deploy": "npm run build && npx wrangler pages deploy .next --project-name=ainova-life",
     "deploy:cf": "npm run build && npx wrangler pages deploy .next",
-    "pages:deploy": "npm run build && npx wrangler pages deploy .next"
+    "pages:deploy": "npm run build && npx wrangler pages deploy .next",
+    "worker:deploy": "npm run build && npx wrangler deploy"
   },
   "dependencies": {
     "jose": "^6.0.12",
