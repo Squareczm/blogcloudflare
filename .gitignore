@@ -20,6 +20,11 @@ dist/
 # Vercel
 .vercel
 
+# Cloudflare
+.wrangler/
+wrangler.toml.local
+.dev.vars
+
 # TypeScript
 *.tsbuildinfo
 

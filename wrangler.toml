@@ -2,30 +2,27 @@ name = "ainova-life"
 compatibility_date = "2024-12-04"
 
 # ============================================
-# 重要：选择部署方式
+# 重要：这是 Cloudflare Pages 项目
 # ============================================
 # 
-# 方式 1: Cloudflare Pages（推荐，适合 Next.js）
-#   部署命令: npx wrangler pages deploy .next
-#   不需要适配器，直接支持 Next.js
+# 此项目使用 Cloudflare Pages 部署（不是 Workers）
+# 
+# 部署方式：
+# 1. 在 Cloudflare Dashboard 中连接 GitHub 仓库
+#    构建命令: npm run build
+#    输出目录: .next
+#    部署命令: （留空，让 Cloudflare Pages 自动处理）
 #
-# 方式 2: Cloudflare Workers（需要适配器）
-#   需要安装 @cloudflare/next-on-pages 或使用 OpenNext
-#   部署命令: npx wrangler deploy
+# 2. 或者使用 CLI：
+#    npm run build
+#    npx wrangler pages deploy .next --project-name=ainova-life
 #
 # ============================================
 
-# R2 存储配置（如果使用 R2）
-# 如果使用其他存储方案，可以删除或注释这部分
+# R2 存储配置（在 Cloudflare Dashboard 的 Pages 设置中绑定）
+# 在 Pages > Settings > Functions > R2 Bucket Bindings 中配置
 # [[r2_buckets]]
 # binding = "BLOG_STORAGE"
 # bucket_name = "blog-uploads"
 # preview_bucket_name = "blog-uploads-preview"
-
-# 如果使用 Workers，需要指定入口点（需要适配器）
-# main = "src/index.ts"
-
-# 如果使用静态资源部署
-# [assets]
-# directory = "./dist"
 
