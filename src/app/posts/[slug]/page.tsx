@@ -13,20 +13,24 @@ export const dynamicParams = true;
 // 预生成静态路由参数
 export async function generateStaticParams() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/posts?status=published`, {
-      next: { revalidate: 60 } // 60秒缓存
-    });
+    // 在构建时直接读取文件，而不是 fetch API
+    const fs = await import('fs');
+    const path = await import('path');
     
-    if (!response.ok) {
-      console.error('获取文章列表失败:', response.status);
+    const POSTS_FILE_PATH = path.join(process.cwd(), 'data', 'posts.json');
+    
+    if (!fs.existsSync(POSTS_FILE_PATH)) {
+      console.warn('文章数据文件不存在:', POSTS_FILE_PATH);
       return [];
     }
     
-    const data = await response.json();
-    const posts = data.posts || [];
+    const data = fs.readFileSync(POSTS_FILE_PATH, 'utf8');
+    const allPosts = JSON.parse(data);
     
-    return posts.map((post: any) => ({
+    // 只返回已发布的文章
+    const publishedPosts = allPosts.filter((post: any) => post.status === 'published');
+    
+    return publishedPosts.map((post: any) => ({
       slug: post.slug,
     }));
   } catch (error) {
